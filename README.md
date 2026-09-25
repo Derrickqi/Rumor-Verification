@@ -1,38 +1,42 @@
 # Sparse Conversation Structure Modeling for Early Rumor Verification
 
-This repository accompanies the manuscript **“Sparse Conversation Structure Modeling for Early Rumor Verification.”** It contains the implementation of **Sparse Structural Evidence Enhancement (SSEE)**, a framework designed to model incomplete conversation structures during early rumor verification.
+Research code accompanying the manuscript **Sparse Conversation Structure Modeling for Early Rumor Verification**. SSEE combines RoBERTa node encoding, a two-layer GAT, Structural Evidence Mining (SEM), Adaptive Global Context Compensation (AGCC), and Adaptive Structural Enhancement (ASE).
 
-## Method
+## What is included
 
-SSEE uses RoBERTa to encode the source post and observed replies, followed by a two-layer Graph Attention Network (GAT). It then refines the node representations through three components:
+| Notebook | Experiment |
+| --- | --- |
+| `notebooks/01_drweibo_early_windows.ipynb` | Initial DRWeibo early-window runs; resume-aware version |
+| `notebooks/02_drweibo_multiseed.ipynb` | DRWeibo GAT and SSEE at 10/30/60/120/240 min across five seeds |
+| `notebooks/03_pheme_loeo_multiseed.ipynb` | PHEME leave-one-event-out runs for semantic-only, GAT, SSEE |
+| `notebooks/04_drweibo_ablation.ipynb` | Five-seed SSEE remove-one-component ablations |
+| `notebooks/05_drweibo_parameter_sensitivity.ipynb` | 10-min DRWeibo parameter sensitivity |
+| `notebooks/06_drweibo_complexity.ipynb` | 10-min DRWeibo parameter, runtime, and memory analysis |
+| `notebooks/07_drweibo_case_study.ipynb` | 10-min DRWeibo case study and interpretability analysis |
 
-* **Structural Evidence Mining (SEM):** weights the contribution of observed local interactions.
-* **Adaptive Global Context Compensation (AGCC):** introduces conversation-level context through node-specific gates.
-* **Adaptive Structural Enhancement (ASE):** applies a structure-aware residual refinement.
-
-The enhanced node representations are pooled to predict the veracity label.
+Notebooks retain their original code. Their saved outputs and execution counts were cleared for publication. They have **not** been rerun in this package.
 
 ## Datasets
 
-The experiments use two publicly available datasets. Download them from their original sources:
+Download the original datasets from their providers. Original social-media data is not included in this repository.
 
-* **DRWeibo:** https://github.com/CcQunResearch/DRWeibo
-* **PHEME — Rumour Detection and Veracity Classification:** https://figshare.com/articles/dataset/PHEME_dataset_for_Rumour_Detection_and_Veracity_Classification/6392078
+- DRWeibo: https://github.com/CcQunResearch/DRWeibo
+- PHEME veracity classification (nine events): https://figshare.com/articles/dataset/PHEME_dataset_for_Rumour_Detection_and_Veracity_Classification/6392078
 
-The original datasets are not redistributed in this repository.
+These notebooks expect already processed JSONL files under the `BASE_DIR` configured near the top of each notebook. In particular, DRWeibo uses `splits/DRWeibo/{train,val,test}.jsonl` and early-window data under `DRWeibo/`. PHEME expects a processed full JSONL with an event field. The exact JSONL schema and data preparation scripts **are not yet included**; downloading the original datasets alone does not make these notebooks runnable.
 
-## Evaluation
+## Environment and execution
 
-On **DRWeibo**, models are evaluated at five observation windows: **10, 30, 60, 120, and 240 minutes**. On **PHEME**, cross-event generalization is evaluated using **leave-one-event-out** testing.
+The imports used by this collection include PyTorch, Transformers, NumPy, pandas, scikit-learn, and tqdm; see `requirements.txt`. Dependency versions and pretrained model weights have not yet been pinned.
 
-The manuscript compares SSEE with a semantic-only model, vanilla GAT, BiGCN, and RAGCL. It also reports component ablations, parameter sensitivity, computational cost, and case studies.
+Before running, adjust `BASE_DIR` in each notebook (currently an AutoDL filesystem path), provide the processed dataset files and local pretrained model folders (`chinese_roberta_wwm_ext` and `roberta_base`), and verify the output directory and checkpoint settings. Run cells in order with a CUDA-capable environment. The multiseed and ablation notebooks can reuse earlier saved results/checkpoints, so check those dependencies before starting a clean run.
 
-SSEE obtains the highest average Macro-F1 in four of the five DRWeibo windows. Its advantage is not uniform across windows: vanilla GAT performs better at 60 minutes. On PHEME, SSEE has the highest overall average Macro-F1 among the evaluated models, but its paired difference from vanilla GAT is **not statistically significant**.
+The experimental seeds in the multiseed notebooks are `42, 52, 62, 72, 82`. DRWeibo uses five early observation windows; PHEME uses leave-one-event-out evaluation. These notebooks have not been validated end-to-end outside the original compute environment.
 
-## Reproduction
+## Coverage and remaining release work
 
-Installation instructions, dataset preprocessing steps, training commands, evaluation commands, configuration files, and random seeds will be documented here when the corresponding code is uploaded.
+The provided notebooks implement the controlled semantic-only / GAT / SSEE experiments, ablations, sensitivity, complexity and case study. **BiGCN and RAGCL implementations used for the external comparisons are not among the supplied notebooks**, so the entire paper is not yet reproducible from this repository. Add the baseline implementations, exact fixed splits or split-generation code, preprocessing scripts and schema, model-weight instructions, pinned dependency versions, and machine-readable result summaries before describing this repository as a complete reproduction package.
 
 ## Citation
 
-Citation information will be added when the manuscript is publicly available.
+Citation details will be added once the manuscript is publicly available.
